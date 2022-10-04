@@ -11,20 +11,26 @@ def f(x, is_mismatch = False):
     
     # f = alpha_mot * torch.sin(beta_mot * x + phi_mot) + a_mot
     f = torch.tensor([[1, 1], [0,  1]], dtype=torch.float32).matmul(x)
-    if is_mismatch:
-        a_deg = 20
-        a = a_deg / 180 * pi
-        Rot = torch.tensor([[cos(a), -sin(a)], [sin(a),  cos(a)]])
-        f = torch.matmul(Rot, f)
+    # if is_mismatch:
+    #     a_deg = 20
+    #     a = a_deg / 180 * pi
+    #     Rot = torch.tensor([[cos(a), -sin(a)], [sin(a),  cos(a)]])
+    #     f = torch.matmul(Rot, f)
         
         
     return f
 
-def h(x):
+def h(x, is_mismatch = False):
     # h = alpha_obs * (beta_obs*x + a_obs)**2
     # x2 = 0.0001 * (x.copy())**2
     # h = 1 / ( 1 + torch.exp(-x))
     h = x
+    if is_mismatch:
+        a_deg = 20
+        a = a_deg / 180 * pi
+        Rot = torch.tensor([[cos(a), -sin(a)], [sin(a),  cos(a)]])
+        h = torch.matmul(Rot, h)
+        
     return h
 
 def fInacc(x):

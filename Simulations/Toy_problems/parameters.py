@@ -20,7 +20,7 @@ n = 2
 m1x_0 = torch.tensor([10, 0], dtype=dtype_) #torch.ones(m, 1) * 10
 m2x_0 = torch.zeros(m,m)
 
-T = 100 #20
+T = 20 #100 
 T_test = 100
 #######################
 ### True Parameters ###
