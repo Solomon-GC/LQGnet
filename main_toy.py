@@ -53,10 +53,10 @@ steady_state_enable=False
 control_enable=True
 # Set mismatch flag
 is_mismatch = True
-mismatchType = 'H_'
+mismatchType = 'G_'
 
-r2_dB = torch.arange(-10,20,5) 
-# r2_dB = torch.tensor([0]) 
+r2_dB = torch.arange(-10,30,5) 
+# r2_dB = torch.tensor([20,25]) 
 q2_dB = r2_dB # Align both dynamic and observation noises
 nExperiments = len(r2_dB)
 r2 = 10**(r2_dB/10)
@@ -195,9 +195,6 @@ for index in range(0,nExperiments):
    # Run MB LQG and LGQNet
    if os.path.exists(modelFolder + "pipeline_" + modelName + ".pt"):
       KNet_Pipeline = torch.load(modelFolder + "pipeline_" + modelName + ".pt")
-      # [MSE_EKF_dB_avg, MSE_EKF_dB_std, LQG_cost_dB, EKF_x_hat, EKF_x_true] = EKFTest(sys_model, test_noise, steady_state=steady_state_enable, is_control_enable=control_enable, EKF_enable=True)
-      # [LQG_loss_summary, MSE_loss_total_summary, MSE_loss_position_summary] = KNet_Pipeline.NNTest(test_noise)
-      
    else:
       torch.manual_seed(num)
       # Run LQG problem with EKF enable

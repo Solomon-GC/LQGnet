@@ -25,11 +25,11 @@ def h(x, is_mismatch = False):
     # x2 = 0.0001 * (x.copy())**2
     # h = 1 / ( 1 + torch.exp(-x))
     h = x
-    if is_mismatch:
-        a_deg = 20
-        a = a_deg / 180 * pi
-        Rot = torch.tensor([[cos(a), -sin(a)], [sin(a),  cos(a)]])
-        h = torch.matmul(Rot, h)
+    # if is_mismatch:
+    #     a_deg = 20
+    #     a = a_deg / 180 * pi
+    #     Rot = torch.tensor([[cos(a), -sin(a)], [sin(a),  cos(a)]])
+    #     h = torch.matmul(Rot, h)
         
     return h
 

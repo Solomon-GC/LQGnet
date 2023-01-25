@@ -8,6 +8,7 @@ import os
 from lqr_utils import LQR_cost
 import matplotlib.pyplot as plt
 from support_functions import mean_and_std_linear_and_dB
+from math import log10, cos, sin, pi
 
 if torch.cuda.is_available():
     dev = torch.device("cuda:0")
@@ -132,6 +133,14 @@ class Pipeline_EKF:
 
             Batch_Optimizing_LOSS_sum = 0
 
+            if self.ssModel.is_mismatch:
+                a_deg = 20
+                a = a_deg / 180 * pi
+                Rot = torch.tensor([[cos(a), -sin(a)], [sin(a),  cos(a)]])
+                G = torch.matmul(Rot, self.ssModel.G)
+            else:
+                G = self.ssModel.G
+                
             for j in range(0, self.N_batch):
                 
                 # Select random noise sequence from training set
@@ -160,8 +169,10 @@ class Pipeline_EKF:
                         else:
                             u[:, t-1] = - torch.matmul(self.ssModel.L[t-1], dx)
                     
+                    
                     # Simulate state evolution + control
-                    x_true[:, t] = self.ssModel.f(x_true[:,t-1],self.ssModel.is_mismatch) + self.ssModel.G.matmul(u[:, t-1]) + q_noise[:,t-1]
+                    # x_true[:, t] = self.ssModel.f(x_true[:,t-1],self.ssModel.is_mismatch) + self.ssModel.G.matmul(u[:, t-1]) + q_noise[:,t-1]
+                    x_true[:, t] = self.ssModel.f(x_true[:,t-1],self.ssModel.is_mismatch) + G.matmul(u[:, t-1]) + q_noise[:,t-1]
                     
                     # Simulate observation
                     yt = self.ssModel.h(x_true[:, t], self.ssModel.is_mismatch) + r_noise[:,t-1]
@@ -243,7 +254,8 @@ class Pipeline_EKF:
                                 u[:, t-1] = - torch.matmul(self.ssModel.L[t-1], dx)
                         
                         # Simulate state evolution + control
-                        x_true[:, t] = self.ssModel.f(x_true[:,t-1], self.ssModel.is_mismatch) + self.ssModel.G.matmul(u[:, t-1]) + q_noise[:,t-1]
+                        # x_true[:, t] = self.ssModel.f(x_true[:,t-1], self.ssModel.is_mismatch) + self.ssModel.G.matmul(u[:, t-1]) + q_noise[:,t-1]
+                        x_true[:, t] = self.ssModel.f(x_true[:,t-1], self.ssModel.is_mismatch) + G.matmul(u[:, t-1]) + q_noise[:,t-1]
                         
                         # Simulate observation
                         yt = self.ssModel.h(x_true[:, t], self.ssModel.is_mismatch) + r_noise[:,t-1]
@@ -332,6 +344,14 @@ class Pipeline_EKF:
         
         self.model.eval()
         
+        if self.ssModel.is_mismatch:
+            a_deg = 20
+            a = a_deg / 180 * pi
+            Rot = torch.tensor([[cos(a), -sin(a)], [sin(a),  cos(a)]])
+            G = torch.matmul(Rot, self.ssModel.G)
+        else:
+            G = self.ssModel.G
+                        
         with torch.no_grad():
         
             start = time.time()
@@ -362,7 +382,8 @@ class Pipeline_EKF:
                             u[:, t-1] = - torch.matmul(self.ssModel.L[t-1], dx)
                     
                     # Simulate state evolution + control
-                    x_true[:, t] = self.ssModel.f(x_true[:,t-1], self.ssModel.is_mismatch) + self.ssModel.G.matmul(u[:, t-1]) + q_noise[:,t-1]
+                    # x_true[:, t] = self.ssModel.f(x_true[:,t-1], self.ssModel.is_mismatch) + self.ssModel.G.matmul(u[:, t-1]) + q_noise[:,t-1]
+                    x_true[:, t] = self.ssModel.f(x_true[:,t-1], self.ssModel.is_mismatch) + G.matmul(u[:, t-1]) + q_noise[:,t-1]
                     
                     # Simulate observation
                     yt = self.ssModel.h(x_true[:, t], self.ssModel.is_mismatch) + r_noise[:,t-1]

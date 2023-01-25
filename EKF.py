@@ -5,6 +5,7 @@ import torch
 
 from filing_paths import path_model
 import matplotlib.pyplot as plt
+from math import log10, cos, sin, pi
 
 import sys
 sys.path.insert(1, path_model)
@@ -158,6 +159,13 @@ class ExtendedKalmanFilter:
         # Debug params
         condVec = torch.zeros(1,T)
         
+        if self.is_mismatch:
+            a_deg = 20
+            a = a_deg / 180 * pi
+            Rot = torch.tensor([[cos(a), -sin(a)], [sin(a),  cos(a)]])
+            G = torch.matmul(Rot, self.G)
+        else:
+            G = self.G
         
         for t in range(1, T+1):
             
@@ -170,7 +178,8 @@ class ExtendedKalmanFilter:
                     self.u[:, t-1] = - torch.matmul(L[t-1], dx)
                     
             # State Model
-            self.x[:,t] = self.f(self.x[:, t-1], self.is_mismatch) + self.G.matmul(self.u[:, t-1]) + q_noise[:, t-1] 
+            # self.x[:,t] = self.f(self.x[:, t-1], self.is_mismatch) + self.G.matmul(self.u[:, t-1]) + q_noise[:, t-1] 
+            self.x[:,t] = self.f(self.x[:, t-1], self.is_mismatch) + G.matmul(self.u[:, t-1]) + q_noise[:, t-1] 
             # Observation model
             yt = self.h(self.x[:,t], self.is_mismatch) + r_noise[:, t-1]
             # Save Current Observation to Trajectory Array
