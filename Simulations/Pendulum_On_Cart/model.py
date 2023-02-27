@@ -7,13 +7,6 @@ from parameters import m_c, m_p, l, g, n_x, n_u, dt, d
 # python libraries
 import numpy as np
 
-# pydrake imports
-from pydrake.all import (Variable, SymbolicVectorSystem, DiagramBuilder,
-                         LogVectorOutput, Simulator, ConstantVectorSource,
-                         MathematicalProgram, Solve, SnoptSolver, PiecewisePolynomial)
-import pydrake.symbolic as sym
-from scipy.integrate import solve_ivp
-
 if torch.cuda.is_available():
     cuda0 = torch.device("cuda:0")  # you can continue going on here, like cuda:1 cuda:2....etc.
     torch.set_default_tensor_type('torch.cuda.FloatTensor')
@@ -23,7 +16,9 @@ else:
 
 # Cartpole (nonlinear) dynamics
 def f(x, u):
-    # Compute f1
+    '''
+        The cartpole dynamics is a nonlinear dynamics, and is very popular "toy example" in model-based as well as data-driven algorithms.
+    '''
     theta = x[2]
     s = torch.sin(theta)
     c = torch.cos(theta)
