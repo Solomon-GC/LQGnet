@@ -40,13 +40,15 @@ x_goal = torch.tensor([0.0, 0.0, np.pi, 0.0], dtype=dtype_)
 m1x_0 = torch.tensor([1.0, 0.0, 0.0*np.pi, 0], dtype=dtype_) #torch.ones(m, 1) * 10
 m2x_0 = torch.zeros(n_x, n_x, dtype=dtype_)
 
+# LQG trials
+N_trials = 10
+
 # Max iLQR iterations
 max_iter=5
 # regularization 
 regu_init=100
 
 T_test = num_time_pts
-
 
 # Set noise mean and covariances for dynamics and measurement
 sigma_x = 0.1
@@ -63,8 +65,16 @@ v_weight = 1.0
 theta_weight = 500.0
 omega_weight = 1.0
 
-Q = torch.tensor([[x_weight, 0.0, 0.0, 0.0],[0.0, v_weight, 0.0, 0.0],[0.0, 0.0, theta_weight, 0.0], [0.0, 0.0, 0.0, omega_weight]], dtype=dtype_).to(dev)
-QT = torch.tensor([[x_weight, 0.0, 0.0, 0.0],[0.0, v_weight, 0.0, 0.0],[0.0, 0.0, theta_weight, 0.0], [0.0, 0.0, 0.0, omega_weight]], dtype=dtype_).to(dev) # final weight matrix
+Q = torch.tensor([[x_weight, 0.0, 0.0, 0.0],
+                  [0.0, v_weight, 0.0, 0.0],
+                  [0.0, 0.0, theta_weight, 0.0], 
+                  [0.0, 0.0, 0.0, omega_weight]], dtype=dtype_).to(dev)
+
+QT = torch.tensor([[x_weight, 0.0, 0.0, 0.0],
+                   [0.0, v_weight, 0.0, 0.0],
+                   [0.0, 0.0, theta_weight, 0.0], 
+                   [0.0, 0.0, 0.0, omega_weight]], dtype=dtype_).to(dev) # final weight matrix
+
 R = torch.squeeze(torch.eye(n_u, dtype=dtype_)).to(dev) # Control input weight 
 
 
